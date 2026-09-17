@@ -163,6 +163,38 @@ function updateThemeIcon(theme) {
   }
 }
 
+// Sidebar Collapse / Retractable Control
+function initSidebar() {
+  const isCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
+  if (isCollapsed && window.innerWidth >= 1024) {
+    document.body.classList.add('sidebar-collapsed');
+  }
+  updateSidebarCollapseIcon();
+}
+
+function toggleSidebar() {
+  const isMobile = window.innerWidth < 1024;
+  const sidebar = document.querySelector('.sidebar');
+  if (isMobile) {
+    if (sidebar) sidebar.classList.toggle('open');
+  } else {
+    document.body.classList.toggle('sidebar-collapsed');
+    const collapsed = document.body.classList.contains('sidebar-collapsed');
+    localStorage.setItem('sidebar_collapsed', collapsed ? 'true' : 'false');
+    updateSidebarCollapseIcon();
+    // Dispatch window resize so charts adjust to new width immediately
+    window.dispatchEvent(new Event('resize'));
+  }
+}
+
+function updateSidebarCollapseIcon() {
+  const isCollapsed = document.body.classList.contains('sidebar-collapsed');
+  const icon = document.getElementById('sidebar-collapse-icon');
+  if (icon) {
+    icon.className = isCollapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left';
+  }
+}
+
 // Global Event Listeners
 function setupGlobalEvents() {
   // Navigation tabs
@@ -174,12 +206,41 @@ function setupGlobalEvents() {
     });
   });
 
-  // Mobile menu toggle
+  // Sidebar toggle buttons (Topbar Hamburger & Sidebar Chevron)
   const menuBtn = document.getElementById('btn-menu-toggle');
-  const sidebar = document.querySelector('.sidebar');
-  if (menuBtn && sidebar) {
-    menuBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
+  if (menuBtn) {
+    menuBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleSidebar();
+    });
+  }
+
+  const collapseBtn = document.getElementById('btn-sidebar-collapse');
+  if (collapseBtn) {
+    collapseBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleSidebar();
+    });
+  }
+
+  // Click brand icon to expand if collapsed
+  const brandIcon = document.querySelector('.brand-icon');
+  if (brandIcon) {
+    brandIcon.addEventListener('click', () => {
+      if (document.body.classList.contains('sidebar-collapsed')) {
+        toggleSidebar();
+      }
+    });
+  }
+
+  // Close sidebar on mobile when clicking main area
+  const mainWrapper = document.querySelector('.main-wrapper');
+  if (mainWrapper) {
+    mainWrapper.addEventListener('click', () => {
+      const sidebar = document.querySelector('.sidebar');
+      if (sidebar && sidebar.classList.contains('open') && window.innerWidth < 1024) {
+        sidebar.classList.remove('open');
+      }
     });
   }
 
@@ -210,6 +271,7 @@ function setupGlobalEvents() {
 // App Initialization
 document.addEventListener('DOMContentLoaded', () => {
   setupTheme();
+  initSidebar();
   setupGlobalEvents();
 
   // Initialize modules
@@ -229,3 +291,4 @@ window.switchTab = switchTab;
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.showToast = showToast;
+window.toggleSidebar = toggleSidebar;
