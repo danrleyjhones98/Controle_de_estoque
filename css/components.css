@@ -699,21 +699,466 @@
   }
 }
 
-/* Print Styling */
+/* ==========================================================================
+   MÓDULO FISCAL & SIMULADOR DE NF-E / DANFE
+   ========================================================================== */
+
+.form-section-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-xs);
+}
+
+.form-section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--color-primary);
+}
+
+.form-section-header h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.form-section-header i {
+  font-size: 1rem;
+}
+
+.btn-link-action {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: 0.775rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  border-radius: var(--radius-xs);
+  transition: all var(--transition-fast);
+}
+
+.btn-link-action:hover {
+  text-decoration: underline;
+  color: var(--color-primary-hover);
+}
+
+.duplicatas-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.duplicata-pill {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.775rem;
+}
+
+.dup-num {
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+}
+
+.dup-date {
+  color: var(--text-secondary);
+}
+
+.dup-val {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   DANFE OFICIAL (DOCUMENTO AUXILIAR DA NF-E)
+   ========================================================================== */
+
+.danfe-toolbar {
+  max-width: 900px;
+  margin: 0 auto 16px auto;
+  padding: 12px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+
+.danfe-toolbar-left,
+.danfe-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.danfe-sheet {
+  max-width: 900px;
+  margin: 0 auto 30px auto;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #64748b;
+  box-shadow: var(--shadow-lg);
+  padding: 16px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 8pt;
+  line-height: 1.2;
+}
+
+.danfe-sheet * {
+  box-sizing: border-box;
+}
+
+/* Canhoto */
+.danfe-canhoto {
+  display: flex;
+  border: 1px solid #000000;
+  font-size: 7pt;
+}
+
+.canhoto-decl {
+  flex: 3;
+  padding: 6px 8px;
+  border-right: 1px solid #000000;
+  line-height: 1.3;
+}
+
+.canhoto-rec {
+  flex: 3;
+  display: flex;
+  border-right: 1px solid #000000;
+}
+
+.canhoto-subbox {
+  padding: 4px 6px;
+  border-right: 1px solid #000000;
+  font-size: 6.5pt;
+  color: #333333;
+}
+
+.canhoto-subbox:last-child {
+  border-right: none;
+}
+
+.canhoto-nf {
+  width: 100px;
+  padding: 6px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.canhoto-nf strong {
+  font-size: 11pt;
+}
+
+.danfe-picote {
+  text-align: center;
+  font-size: 6.5pt;
+  color: #666666;
+  margin: 6px 0;
+  letter-spacing: -0.5px;
+}
+
+/* Grid Header */
+.danfe-grid-header {
+  display: grid;
+  grid-template-columns: 3.2fr 2fr 3.8fr;
+  border: 1px solid #000000;
+  margin-bottom: 3px;
+}
+
+.danfe-box {
+  border: 1px solid #000000;
+  padding: 3px 5px;
+  position: relative;
+  background: #ffffff;
+}
+
+.danfe-box label {
+  display: block;
+  font-size: 6pt;
+  font-weight: bold;
+  color: #333333;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.danfe-box .val {
+  font-size: 8pt;
+  text-align: right;
+}
+
+.danfe-box .font-bold {
+  font-weight: bold;
+}
+
+.danfe-box.val-highlight {
+  background: #f1f5f9;
+}
+
+.danfe-emitente {
+  border: none;
+  border-right: 1px solid #000000;
+  padding: 8px 10px;
+}
+
+.emitente-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.emit-logo-ico {
+  width: 42px;
+  height: 42px;
+  background: #1e40af;
+  color: #ffffff;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.emit-text h3 {
+  font-size: 9.5pt;
+  font-weight: bold;
+  margin-bottom: 3px;
+  line-height: 1.15;
+}
+
+.emit-text p {
+  font-size: 7pt;
+  margin: 1px 0;
+  color: #222222;
+}
+
+.danfe-ident {
+  border: none;
+  border-right: 1px solid #000000;
+  text-align: center;
+  padding: 6px;
+}
+
+.danfe-ident h2 {
+  font-size: 15pt;
+  font-weight: 900;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.danfe-ident p {
+  font-size: 6.5pt;
+  line-height: 1.1;
+  margin: 2px 0 4px 0;
+}
+
+.danfe-tipo-op {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 6.5pt;
+  margin-bottom: 6px;
+}
+
+.tipo-op-badge {
+  border: 1px solid #000000;
+  font-weight: bold;
+  font-size: 9pt;
+  padding: 0 6px;
+}
+
+.danfe-num-serie strong {
+  display: block;
+  font-size: 9.5pt;
+}
+
+.danfe-num-serie span {
+  font-size: 7pt;
+}
+
+.danfe-barcode-box {
+  border: none;
+  padding: 6px 8px;
+  text-align: center;
+}
+
+.barcode-svg-wrap {
+  width: 100%;
+  height: 38px;
+  margin-bottom: 4px;
+}
+
+.barcode-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.chave-label {
+  font-size: 6.5pt;
+  font-weight: bold;
+  text-align: left;
+}
+
+.chave-acesso {
+  font-family: monospace;
+  font-size: 8.5pt;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  margin: 2px 0 4px 0;
+}
+
+.chave-info {
+  font-size: 6pt;
+  color: #333333;
+  line-height: 1.1;
+}
+
+.danfe-row-quad {
+  display: flex;
+  margin-bottom: 3px;
+  gap: 0;
+}
+
+.danfe-row-quad .danfe-box {
+  border-right: none;
+  flex: 1;
+}
+
+.danfe-row-quad .danfe-box:last-child {
+  border-right: 1px solid #000000;
+}
+
+.danfe-section-title {
+  font-size: 6.5pt;
+  font-weight: bold;
+  background: #e2e8f0;
+  padding: 2px 4px;
+  border: 1px solid #000000;
+  border-bottom: none;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+.danfe-duplicatas-row {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid #000000;
+  margin-bottom: 3px;
+}
+
+.dup-item-card {
+  padding: 3px 8px;
+  border-right: 1px solid #000000;
+  display: flex;
+  gap: 8px;
+  font-size: 7pt;
+}
+
+.dup-item-card:last-child {
+  border-right: none;
+}
+
+.danfe-itens-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 6.8pt;
+  margin-bottom: 4px;
+  border: 1px solid #000000;
+}
+
+.danfe-itens-table th {
+  background: #f1f5f9;
+  border: 1px solid #000000;
+  padding: 3px 4px;
+  font-size: 6pt;
+  text-transform: uppercase;
+}
+
+.danfe-itens-table td {
+  border: 1px solid #cbd5e1;
+  padding: 3px 4px;
+}
+
+/* ==========================================================================
+   PRINT RULES PARA DANFE A4
+   ========================================================================== */
 @media print {
-  .sidebar, .topbar, .toolbar, .btn, .btn-table-action, .toast-container, .alert-ribbon {
+  @page {
+    size: A4 portrait;
+    margin: 8mm;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 8pt !important;
+  }
+
+  /* Ocultar elementos desnecessários na folha impressa */
+  .sidebar, 
+  .topbar, 
+  .alert-ribbon, 
+  .toast-container, 
+  .no-print, 
+  .danfe-toolbar, 
+  .action-buttons-group,
+  .btn,
+  .modal-backdrop {
     display: none !important;
   }
+
   .main-wrapper {
+    margin-left: 0 !important;
     margin: 0 !important;
+    padding: 0 !important;
     width: 100% !important;
+    max-width: 100% !important;
   }
-  body {
-    background: white !important;
-    color: black !important;
+
+  .page-content {
+    padding: 0 !important;
+    margin: 0 !important;
   }
-  .card, .table-card, .chart-card {
+
+  .tab-pane {
+    display: none !important;
+  }
+
+  #tab-fiscal-danfe {
+    display: block !important;
+  }
+
+  .danfe-sheet {
     box-shadow: none !important;
-    border: 1px solid #ccc !important;
+    border: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 }

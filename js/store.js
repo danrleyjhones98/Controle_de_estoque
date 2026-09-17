@@ -2,14 +2,16 @@
  * store.js - Central Data Management & Persistence (Especializado: Fábrica de Pallets)
  */
 
-const STORAGE_VERSION = 'pallet_factory_v2_4';
+const STORAGE_VERSION = 'pallet_erp_fiscal_v3_0';
 const VERSION_KEY = 'sto_data_version';
 
 const STORAGE_KEYS = {
   PRODUCTS: 'sto_pallet_products',
   EMPLOYEES: 'sto_pallet_employees',
   PRODUCTION: 'sto_pallet_production',
-  MOVEMENTS: 'sto_pallet_movements'
+  MOVEMENTS: 'sto_pallet_movements',
+  PARCEIROS: 'sto_pallet_parceiros',
+  NOTAS_FISCAIS: 'sto_pallet_notas_fiscais'
 };
 
 // Helper for relative dates
@@ -730,6 +732,264 @@ const SEED_MOVEMENTS = [
   }
 ];
 
+// --- SEED DE CLIENTES E FORNECEDORES (PARCEIROS FISCAIS) ---
+const SEED_PARCEIROS = [
+  {
+    id: 1,
+    razao_social: 'Pallets Brasil Ind. e Comércio de Embalagens Ltda',
+    nome_fantasia: 'Pallets Brasil Matriz',
+    cnpj: '14.892.401/0001-88',
+    tipo: 'EMITENTE',
+    inscricao_estadual: '114.890.320.119',
+    logradouro: 'Rodovia dos Bandeirantes',
+    numero: 'Km 78 - Galpão 04',
+    bairro: 'Distrito Industrial',
+    municipio: 'Campinas',
+    uf: 'SP',
+    cep: '13054-700',
+    telefone: '(19) 3450-8800',
+    email: 'fiscal@palletsbrasil.com.br'
+  },
+  {
+    id: 2,
+    razao_social: 'Cervejaria Artesanal Vale do Rio Ltda',
+    nome_fantasia: 'Cervejaria Vale do Rio',
+    cnpj: '28.904.551/0001-14',
+    tipo: 'CLIENTE',
+    inscricao_estadual: '86.412.390-5',
+    logradouro: 'Av. das Indústrias',
+    numero: '1500',
+    bairro: 'Polo Cervejeiro',
+    municipio: 'Ribeirão Preto',
+    uf: 'SP',
+    cep: '14075-200',
+    telefone: '(16) 3890-4400',
+    email: 'compras@valedorio.com.br'
+  },
+  {
+    id: 3,
+    razao_social: 'Cooperativa Agrícola e Logística Sul Brasil',
+    nome_fantasia: 'CoopSul Logística',
+    cnpj: '19.458.231/0001-78',
+    tipo: 'CLIENTE',
+    inscricao_estadual: '062.339.810.001',
+    logradouro: 'Rua dos Inconfidentes',
+    numero: '1188',
+    bairro: 'Distrito Agro',
+    municipio: 'Passo Fundo',
+    uf: 'RS',
+    cep: '99050-120',
+    telefone: '(54) 3320-8800',
+    email: 'suprimentos@coopsul.com.br'
+  },
+  {
+    id: 4,
+    razao_social: 'Dell Computadores do Brasil Ltda',
+    nome_fantasia: 'Dell Technologies',
+    cnpj: '72.381.189/0001-10',
+    tipo: 'FORNECEDOR',
+    inscricao_estadual: '356.128.490.115',
+    logradouro: 'Av. da Emancipação',
+    numero: '5000',
+    bairro: 'Parque dos Servidores',
+    municipio: 'Hortolândia',
+    uf: 'SP',
+    cep: '13184-654',
+    telefone: '(19) 3887-2000',
+    email: 'vendas.corporativo@dell.com'
+  },
+  {
+    id: 5,
+    razao_social: 'Madeireira & Silvicultura Pinus Brasil S.A.',
+    nome_fantasia: 'Pinus Brasil Madeiras',
+    cnpj: '51.797.741/0001-92',
+    tipo: 'FORNECEDOR',
+    inscricao_estadual: '101.458.789.200',
+    logradouro: 'Rodovia BR-116',
+    numero: 'S/N - Km 140',
+    bairro: 'Zona Rural Madeireira',
+    municipio: 'Lages',
+    uf: 'SC',
+    cep: '88500-000',
+    telefone: '(49) 3221-4000',
+    email: 'comercial@pinusbrasil.com.br'
+  },
+  {
+    id: 6,
+    razao_social: 'Hospital e Maternidade Santa Clara Ltda',
+    nome_fantasia: 'Hospital Santa Clara',
+    cnpj: '14.882.109/0001-30',
+    tipo: 'CLIENTE',
+    inscricao_estadual: 'ISENTO',
+    logradouro: 'Av. Barão de Itapura',
+    numero: '1200',
+    bairro: 'Botafogo',
+    municipio: 'Campinas',
+    uf: 'SP',
+    cep: '13020-432',
+    telefone: '(19) 3780-1500',
+    email: 'suprimentos@hospitalsantaclara.com.br'
+  }
+];
+
+// --- SEED DE NOTAS FISCAIS ELETRÔNICAS (SIMULADOR DE FATURAMENTO) ---
+const SEED_NOTAS_FISCAIS = [
+  {
+    id: 1,
+    numero_nf: '000.089.458',
+    serie: '1',
+    tipo_operacao: 'SAIDA',
+    natureza_operacao: 'VENDA DE PRODUCAO DO ESTABELECIMENTO',
+    chave_acesso: '35260914892401000188550010000894581234567890',
+    protocolo_autorizacao: '135260089458123 - 15/09/2026 14:32:10',
+    data_emissao: getRecentDateStr(2) + 'T14:30:00',
+    data_saida_entrada: getRecentDateStr(2) + 'T16:00:00',
+    emitente_id: 1,
+    destinatario_id: 2,
+    emitente_nome: 'Pallets Brasil Ind. e Comércio de Embalagens Ltda',
+    emitente_cnpj: '14.892.401/0001-88',
+    emitente_ie: '114.890.320.119',
+    emitente_endereco: 'Rodovia dos Bandeirantes, Km 78 - Galpão 04 - Campinas/SP',
+    destinatario_nome: 'Cervejaria Artesanal Vale do Rio Ltda',
+    destinatario_cnpj: '28.904.551/0001-14',
+    destinatario_ie: '86.412.390-5',
+    destinatario_endereco: 'Av. das Indústrias, 1500 - Polo Cervejeiro - Ribeirão Preto/SP',
+    valor_produtos: 10200.00,
+    base_calculo_icms: 10200.00,
+    valor_icms: 1836.00,
+    base_calculo_icms_st: 0,
+    valor_icms_st: 0,
+    valor_frete: 350.00,
+    valor_seguro: 0,
+    valor_desconto: 0,
+    outras_despesas: 0,
+    valor_ipi: 0,
+    valor_total: 10550.00,
+    modalidade_frete: '0 - Por conta do Emitente (CIF)',
+    transportadora_nome: 'TransLogística Rodoviária Cargas Ltda',
+    transportadora_cnpj: '44.891.023/0001-50',
+    veiculo_placa: 'BRA2E19',
+    veiculo_uf: 'SP',
+    volumes_quantidade: 150,
+    volumes_especie: 'PALLETS',
+    peso_bruto: 3750.00,
+    peso_liquido: 3750.00,
+    informacoes_complementares: 'DOCUMENTO FISCAL EMITIDO EM REGIME NORMAL DE TRIBUTAÇÃO. CARGA COMPOSTA POR 150 PALLETS PBR-1 PADRÃO ABRAS. TRIBUTOS TOTAIS APROXIMADOS (LEI 12.741/2012): R$ 1.950,00 (18.48%). CHAVE PIX CNPJ: 14.892.401/0001-88.',
+    status: 'AUTORIZADA',
+    itens: [
+      {
+        id: 1,
+        nota_id: 1,
+        produto_id: 'prod-pal-001',
+        codigo: 'PAL-PBR1',
+        descricao: 'Pallet PBR 1 Padronizado (1000 x 1200 mm - 4 Entradas)',
+        ncm: '4415.20.00',
+        cst: '000',
+        cfop: '5.101',
+        unidade: 'un',
+        quantidade: 150,
+        valor_unitario: 68.00,
+        valor_total: 10200.00,
+        base_calculo_icms: 10200.00,
+        valor_icms: 1836.00,
+        aliq_icms: 18.00,
+        valor_ipi: 0,
+        aliq_ipi: 0
+      }
+    ],
+    duplicatas: [
+      { id: 1, nota_id: 1, numero: '089458/01', vencimento: getRecentDateStr(-15), valor: 5275.00, forma_pagamento: 'BOLETO BANCARIO' },
+      { id: 2, nota_id: 1, numero: '089458/02', vencimento: getRecentDateStr(-45), valor: 5275.00, forma_pagamento: 'BOLETO BANCARIO' }
+    ]
+  },
+  {
+    id: 2,
+    numero_nf: '000.089.459',
+    serie: '1',
+    tipo_operacao: 'ENTRADA',
+    natureza_operacao: 'COMPRA DE MATERIA-PRIMA PARA INDUSTRIALIZACAO',
+    chave_acesso: '42260951797741000192550010000894591987654321',
+    protocolo_autorizacao: '142260089459345 - 16/09/2026 09:15:22',
+    data_emissao: getRecentDateStr(1) + 'T09:10:00',
+    data_saida_entrada: getRecentDateStr(1) + 'T11:00:00',
+    emitente_id: 5,
+    destinatario_id: 1,
+    emitente_nome: 'Madeireira & Silvicultura Pinus Brasil S.A.',
+    emitente_cnpj: '51.797.741/0001-92',
+    emitente_ie: '101.458.789.200',
+    emitente_endereco: 'Rodovia BR-116, S/N - Km 140 - Lages/SC',
+    destinatario_nome: 'Pallets Brasil Ind. e Comércio de Embalagens Ltda',
+    destinatario_cnpj: '14.892.401/0001-88',
+    destinatario_ie: '114.890.320.119',
+    destinatario_endereco: 'Rodovia dos Bandeirantes, Km 78 - Galpão 04 - Campinas/SP',
+    valor_produtos: 6450.00,
+    base_calculo_icms: 6450.00,
+    valor_icms: 774.00,
+    base_calculo_icms_st: 0,
+    valor_icms_st: 0,
+    valor_frete: 420.00,
+    valor_seguro: 0,
+    valor_desconto: 0,
+    outras_despesas: 0,
+    valor_ipi: 0,
+    valor_total: 6870.00,
+    modalidade_frete: '1 - Por conta do Destinatário (FOB)',
+    transportadora_nome: 'Viação Cargas Pesadas do Sul',
+    transportadora_cnpj: '33.120.900/0001-77',
+    veiculo_placa: 'MDR9J80',
+    veiculo_uf: 'SC',
+    volumes_quantidade: 24,
+    volumes_especie: 'FARDOS',
+    peso_bruto: 12800.00,
+    peso_liquido: 12800.00,
+    informacoes_complementares: 'CARGA DE TÁBUAS E BARROTES DE PINUS TRATADO EM ESTUFA. AUTORIZAÇÃO DE TRANSPORTE AMBIENTAL IBAMA/DOF Nº 84920194. ICMS RECOLHIDO NA ORIGEM CONFORME CONVÊNIO.',
+    status: 'AUTORIZADA',
+    itens: [
+      {
+        id: 1,
+        nota_id: 2,
+        produto_id: 'prod-pal-005',
+        codigo: 'MP-TAB-120',
+        descricao: 'Tábua de Pinus Aparelhada (15 x 100 x 1200 mm)',
+        ncm: '4407.11.00',
+        cst: '000',
+        cfop: '2.101',
+        unidade: 'un',
+        quantidade: 800,
+        valor_unitario: 4.80,
+        valor_total: 3840.00,
+        base_calculo_icms: 3840.00,
+        valor_icms: 460.80,
+        aliq_icms: 12.00,
+        valor_ipi: 0,
+        aliq_ipi: 0
+      },
+      {
+        id: 2,
+        nota_id: 2,
+        produto_id: 'prod-pal-006',
+        codigo: 'MP-LON-120',
+        descricao: 'Barrote / Longarina de Eucalipto Bruto (45 x 90 x 1200 mm)',
+        ncm: '4407.12.00',
+        cst: '000',
+        cfop: '2.101',
+        unidade: 'un',
+        quantidade: 300,
+        valor_unitario: 8.70,
+        valor_total: 2610.00,
+        base_calculo_icms: 2610.00,
+        valor_icms: 313.20,
+        aliq_icms: 12.00,
+        valor_ipi: 0,
+        aliq_ipi: 0
+      }
+    ],
+    duplicatas: [
+      { id: 1, nota_id: 2, numero: '089459/01', vencimento: getRecentDateStr(-30), valor: 6870.00, forma_pagamento: 'TRANSFERENCIA BANCARIA' }
+    ]
+  }
+];
+
 class Store {
   constructor() {
     this.subscribers = [];
@@ -739,10 +999,18 @@ class Store {
   init() {
     const savedVersion = localStorage.getItem(VERSION_KEY);
 
-    // Se for primeira vez ou se a versão mudou para a fábrica de pallets, atualiza os dados
+    // Se for primeira vez ou se a versão mudou para o ERP unificado, atualiza os dados
     if (savedVersion !== STORAGE_VERSION || !localStorage.getItem(STORAGE_KEYS.PRODUCTS)) {
       this.resetToDefault();
       localStorage.setItem(VERSION_KEY, STORAGE_VERSION);
+    } else {
+      // Garante que parceiros e notas fiscais existam
+      if (!localStorage.getItem(STORAGE_KEYS.PARCEIROS)) {
+        this.save(STORAGE_KEYS.PARCEIROS, SEED_PARCEIROS);
+      }
+      if (!localStorage.getItem(STORAGE_KEYS.NOTAS_FISCAIS)) {
+        this.save(STORAGE_KEYS.NOTAS_FISCAIS, SEED_NOTAS_FISCAIS);
+      }
     }
   }
 
@@ -1029,16 +1297,202 @@ class Store {
     return newMov;
   }
 
+  // ==========================================================================
+  // PARCEIROS (CLIENTES & FORNECEDORES - MÓDULO FISCAL)
+  // ==========================================================================
+  getParceiros() {
+    return this.load(STORAGE_KEYS.PARCEIROS);
+  }
+
+  getParceiroById(id) {
+    const pId = Number(id);
+    return this.getParceiros().find(p => p.id === pId) || null;
+  }
+
+  saveParceiro(parceiroData) {
+    const parceiros = this.getParceiros();
+    const id = parceiroData.id ? Number(parceiroData.id) : null;
+
+    if (id) {
+      const idx = parceiros.findIndex(p => p.id === id);
+      if (idx !== -1) {
+        parceiros[idx] = {
+          ...parceiros[idx],
+          ...parceiroData,
+          id: id
+        };
+        this.save(STORAGE_KEYS.PARCEIROS, parceiros);
+        return parceiros[idx];
+      }
+    }
+
+    const newId = parceiros.length > 0 ? Math.max(...parceiros.map(p => p.id || 0)) + 1 : 1;
+    const newParceiro = {
+      id: newId,
+      razao_social: parceiroData.razao_social ? parceiroData.razao_social.trim() : 'Novo Parceiro',
+      nome_fantasia: parceiroData.nome_fantasia ? parceiroData.nome_fantasia.trim() : '',
+      cnpj: parceiroData.cnpj ? parceiroData.cnpj.trim() : '',
+      tipo: parceiroData.tipo || 'CLIENTE',
+      inscricao_estadual: parceiroData.inscricao_estadual ? parceiroData.inscricao_estadual.trim() : 'ISENTO',
+      logradouro: parceiroData.logradouro ? parceiroData.logradouro.trim() : '',
+      numero: parceiroData.numero ? parceiroData.numero.trim() : '',
+      bairro: parceiroData.bairro ? parceiroData.bairro.trim() : '',
+      municipio: parceiroData.municipio ? parceiroData.municipio.trim() : 'São Paulo',
+      uf: parceiroData.uf ? parceiroData.uf.trim().toUpperCase() : 'SP',
+      cep: parceiroData.cep ? parceiroData.cep.trim() : '',
+      telefone: parceiroData.telefone ? parceiroData.telefone.trim() : '',
+      email: parceiroData.email ? parceiroData.email.trim() : ''
+    };
+
+    parceiros.push(newParceiro);
+    this.save(STORAGE_KEYS.PARCEIROS, parceiros);
+    return newParceiro;
+  }
+
+  deleteParceiro(id) {
+    const pId = Number(id);
+    const parceiros = this.getParceiros().filter(p => p.id !== pId);
+    this.save(STORAGE_KEYS.PARCEIROS, parceiros);
+    return true;
+  }
+
+  // ==========================================================================
+  // NOTAS FISCAIS ELETRÔNICAS (FATURAMENTO & SIMULADOR FISCAL)
+  // ==========================================================================
+  getNotasFiscais() {
+    return this.load(STORAGE_KEYS.NOTAS_FISCAIS);
+  }
+
+  getNotaById(id) {
+    const nId = Number(id);
+    return this.getNotasFiscais().find(n => n.id === nId) || null;
+  }
+
+  emitirNotaFiscal(notaData, criarMovimentoEstoque = false) {
+    const notas = this.getNotasFiscais();
+    const id = Date.now();
+    const numeroStr = notaData.numero_nf || `000.0${Math.floor(10000 + Math.random() * 90000)}`;
+    const serieStr = notaData.serie || '1';
+
+    // Gerar chave de acesso de 44 dígitos autêntica
+    // UF (35=SP) + AAMM + CNPJ (14 dígitos) + Mod (55) + Série (3 dígitos) + Num (9 dígitos) + TipoEmissao (1) + CodAleatorio (8 dígitos) + DV (1)
+    const d = new Date();
+    const aamm = `${String(d.getFullYear()).slice(-2)}${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const cnpjEmitente = (notaData.emitente_cnpj || '14892401000188').replace(/\D/g, '').padEnd(14, '0');
+    const numLimpo = numeroStr.replace(/\D/g, '').padStart(9, '0');
+    const serieLimpa = serieStr.padStart(3, '0');
+    const aleatorio = String(Math.floor(10000000 + Math.random() * 90000000));
+    const preChave = `35${aamm}${cnpjEmitente}55${serieLimpa}${numLimpo}1${aleatorio}`;
+    
+    // Dígito verificador módulo 11
+    let peso = 2;
+    let soma = 0;
+    for (let i = preChave.length - 1; i >= 0; i--) {
+      soma += parseInt(preChave[i], 10) * peso;
+      peso = peso === 9 ? 2 : peso + 1;
+    }
+    const resto = soma % 11;
+    const dv = resto === 0 || resto === 1 ? 0 : 11 - resto;
+    const chaveAcesso = `${preChave}${dv}`;
+    const protocolo = `135${aamm}${Math.floor(10000000 + Math.random() * 90000000)} - ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}`;
+
+    const novaNota = {
+      id: id,
+      numero_nf: numeroStr,
+      serie: serieStr,
+      tipo_operacao: notaData.tipo_operacao || 'SAIDA',
+      natureza_operacao: notaData.natureza_operacao || 'VENDA DE PRODUCAO DO ESTABELECIMENTO',
+      chave_acesso: chaveAcesso,
+      protocolo_autorizacao: protocolo,
+      data_emissao: new Date().toISOString(),
+      data_saida_entrada: new Date().toISOString(),
+      emitente_id: notaData.emitente_id,
+      destinatario_id: notaData.destinatario_id,
+      emitente_nome: notaData.emitente_nome || 'Pallets Brasil Ind. e Comércio de Embalagens Ltda',
+      emitente_cnpj: notaData.emitente_cnpj || '14.892.401/0001-88',
+      emitente_ie: notaData.emitente_ie || '114.890.320.119',
+      emitente_endereco: notaData.emitente_endereco || 'Rodovia dos Bandeirantes, Km 78 - Campinas/SP',
+      destinatario_nome: notaData.destinatario_nome || '',
+      destinatario_cnpj: notaData.destinatario_cnpj || '',
+      destinatario_ie: notaData.destinatario_ie || 'ISENTO',
+      destinatario_endereco: notaData.destinatario_endereco || '',
+      valor_produtos: parseFloat(notaData.valor_produtos) || 0,
+      base_calculo_icms: parseFloat(notaData.base_calculo_icms) || 0,
+      valor_icms: parseFloat(notaData.valor_icms) || 0,
+      base_calculo_icms_st: parseFloat(notaData.base_calculo_icms_st) || 0,
+      valor_icms_st: parseFloat(notaData.valor_icms_st) || 0,
+      valor_frete: parseFloat(notaData.valor_frete) || 0,
+      valor_seguro: parseFloat(notaData.valor_seguro) || 0,
+      valor_desconto: parseFloat(notaData.valor_desconto) || 0,
+      outras_despesas: parseFloat(notaData.outras_despesas) || 0,
+      valor_ipi: parseFloat(notaData.valor_ipi) || 0,
+      valor_total: parseFloat(notaData.valor_total) || 0,
+      modalidade_frete: notaData.modalidade_frete || '0 - Por conta do Emitente (CIF)',
+      transportadora_nome: notaData.transportadora_nome || '',
+      transportadora_cnpj: notaData.transportadora_cnpj || '',
+      veiculo_placa: notaData.veiculo_placa || '',
+      veiculo_uf: notaData.veiculo_uf || 'SP',
+      volumes_quantidade: parseInt(notaData.volumes_quantidade, 10) || 0,
+      volumes_especie: notaData.volumes_especie || 'VOLUMES',
+      peso_bruto: parseFloat(notaData.peso_bruto) || 0,
+      peso_liquido: parseFloat(notaData.peso_liquido) || 0,
+      informacoes_complementares: notaData.informacoes_complementares || '',
+      status: 'AUTORIZADA',
+      itens: Array.isArray(notaData.itens) ? notaData.itens : [],
+      duplicatas: Array.isArray(notaData.duplicatas) ? notaData.duplicatas : []
+    };
+
+    notas.unshift(novaNota);
+    this.save(STORAGE_KEYS.NOTAS_FISCAIS, notas);
+
+    // Se solicitado e houver produtos vinculados ao estoque, gera movimentação de baixa (SAIDA) ou entrada (ENTRADA)
+    if (criarMovimentoEstoque && Array.isArray(novaNota.itens)) {
+      novaNota.itens.forEach(item => {
+        if (item.produto_id) {
+          const delta = novaNota.tipo_operacao === 'SAIDA' ? -Math.abs(item.quantidade) : Math.abs(item.quantidade);
+          this.adjustStock(
+            item.produto_id,
+            delta,
+            novaNota.tipo_operacao === 'SAIDA' ? 'SAIDA' : 'ENTRADA',
+            `Faturamento Fiscal NF-e nº ${novaNota.numero_nf}`,
+            'Faturamento / Fiscal'
+          );
+        }
+      });
+    }
+
+    return novaNota;
+  }
+
+  cancelarNotaFiscal(id, justificativa = 'Cancelamento solicitado pelo usuário') {
+    const nId = Number(id);
+    const notas = this.getNotasFiscais();
+    const idx = notas.findIndex(n => n.id === nId);
+    if (idx === -1) return null;
+
+    notas[idx] = {
+      ...notas[idx],
+      status: 'CANCELADA',
+      cancelamento_justificativa: justificativa,
+      cancelamento_data: new Date().toISOString()
+    };
+
+    this.save(STORAGE_KEYS.NOTAS_FISCAIS, notas);
+    return notas[idx];
+  }
+
   // --- Export & Backup ---
   exportAllData() {
     return {
       version: STORAGE_VERSION,
-      companyType: 'Fábrica de Pallets e Embalagens de Madeira',
+      companyType: 'Fábrica de Pallets e Embalagens de Madeira • Módulo Fiscal Integrado',
       exportedAt: new Date().toISOString(),
       products: this.getProducts(),
       employees: this.getEmployees(),
       production: this.getProductionRecords(),
-      movements: this.getMovements()
+      movements: this.getMovements(),
+      parceiros: this.getParceiros(),
+      notasFiscais: this.getNotasFiscais()
     };
   }
 
@@ -1050,6 +1504,8 @@ class Store {
     if (Array.isArray(data.employees)) this.save(STORAGE_KEYS.EMPLOYEES, data.employees);
     if (Array.isArray(data.production)) this.save(STORAGE_KEYS.PRODUCTION, data.production);
     if (Array.isArray(data.movements)) this.save(STORAGE_KEYS.MOVEMENTS, data.movements);
+    if (Array.isArray(data.parceiros)) this.save(STORAGE_KEYS.PARCEIROS, data.parceiros);
+    if (Array.isArray(data.notasFiscais)) this.save(STORAGE_KEYS.NOTAS_FISCAIS, data.notasFiscais);
     return true;
   }
 
@@ -1058,6 +1514,8 @@ class Store {
     this.save(STORAGE_KEYS.EMPLOYEES, SEED_EMPLOYEES);
     this.save(STORAGE_KEYS.PRODUCTION, SEED_PRODUCTION);
     this.save(STORAGE_KEYS.MOVEMENTS, SEED_MOVEMENTS);
+    this.save(STORAGE_KEYS.PARCEIROS, SEED_PARCEIROS);
+    this.save(STORAGE_KEYS.NOTAS_FISCAIS, SEED_NOTAS_FISCAIS);
   }
 }
 

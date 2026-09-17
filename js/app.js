@@ -30,27 +30,47 @@ function switchTab(tabId) {
       sub: 'Visão geral do estoque de madeiras, pregos, pallets acabados e produtividade fabril' 
     },
     'products': { 
-      module: 'Gestão de Materiais', 
+      module: 'Indústria & Chão de Fábrica', 
       title: 'Controle de Estoque & Produtos', 
       sub: 'Madeiras, barrotes, réguas, tocos, pregos espiralados e pallets acabados' 
     },
     'employees': { 
-      module: 'Recursos Humanos', 
+      module: 'Indústria & Chão de Fábrica', 
       title: 'Equipe de Produção & Colaboradores', 
       sub: 'Montadores pneumáticos, operadores de serra múltipla, operadores de estufa HT e expedição' 
     },
     'production': { 
-      module: 'Chão de Fábrica', 
+      module: 'Indústria & Chão de Fábrica', 
       title: 'Apontamentos Diários de Pallets', 
       sub: 'Lançamento de pallets montados, desdobro de madeira, refugo e metas diárias' 
     },
     'movements': { 
-      module: 'Logística & Almoxarifado', 
-      title: 'Movimentações de Estoque', 
+      module: 'Indústria & Chão de Fábrica', 
+      title: 'Movimentações de Estoque & Almoxarifado', 
       sub: 'Entradas de cargas de madeira, expedição de carretas de pallets e inventário' 
     },
+    'fiscal-nova-nota': { 
+      module: 'Faturamento & Fiscal (Simulador de Notas)', 
+      title: 'Emissão de NF-e (Simulador de Faturamento)', 
+      sub: 'Emissão de Nota Fiscal Eletrônica com cálculo de impostos, itens e parcelamento' 
+    },
+    'fiscal-historico': { 
+      module: 'Faturamento & Fiscal (Simulador de Notas)', 
+      title: 'Histórico de Notas Fiscais & DANFE', 
+      sub: 'Auditoria de notas fiscais autorizadas, download de arquivos XML e consulta' 
+    },
+    'fiscal-danfe': { 
+      module: 'Faturamento & Fiscal (Simulador de Notas)', 
+      title: 'Visualizador de DANFE Oficial', 
+      sub: 'Documento Auxiliar da Nota Fiscal Eletrônica oficial para impressão e arquivo' 
+    },
+    'fiscal-parceiros': { 
+      module: 'Faturamento & Fiscal (Simulador de Notas)', 
+      title: 'Clientes, Fornecedores & Parceiros', 
+      sub: 'Gestão de parceiros comerciais, CNPJ, Inscrição Estadual e endereços' 
+    },
     'reports': { 
-      module: 'Controladoria & Auditoria', 
+      module: 'Controladoria & Sistema', 
       title: 'Relatórios & Exportação', 
       sub: 'Exportação de relatórios, auditoria física e backup seguro do sistema' 
     }
@@ -79,6 +99,15 @@ function switchTab(tabId) {
     populateProductionSelects();
   } else if (tabId === 'movements') {
     renderMovementsTable();
+  } else if (tabId === 'fiscal-nova-nota') {
+    populateFiscalSelects();
+    renderDraftItensTable();
+  } else if (tabId === 'fiscal-historico') {
+    renderHistoricoNotas();
+  } else if (tabId === 'fiscal-danfe') {
+    renderDanfeDocument(currentNotaDanfeId);
+  } else if (tabId === 'fiscal-parceiros') {
+    renderParceirosTable();
   }
 
   // Close sidebar on mobile
@@ -279,11 +308,12 @@ document.addEventListener('DOMContentLoaded', () => {
   initProducts();
   initProduction();
   initMovements();
+  if (window.initFiscal) window.initFiscal();
 
   // Default to Dashboard
   switchTab('dashboard');
 
-  console.log('✨ Sistema de Controle de Estoque e Produção carregado com sucesso!');
+  console.log('✨ Sistema de Gestão Industrial & Fiscal (ERP Unificado) carregado com sucesso!');
 });
 
 // Expose globals
