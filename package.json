@@ -1,0 +1,13 @@
+{
+  "name": "controle-estoque-producao",
+  "version": "1.0.0",
+  "description": "Sistema de Controle de Estoque e Gestão de Produção Diária",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["estoque", "producao", "dashboard", "gestao", "erp"],
+  "author": "Dev Team",
+  "license": "MIT"
+}

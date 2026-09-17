@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRODEX - Sistema de Controle de Estoque e Gestão de Produção</title>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Application Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand-section">
+        <div class="brand-icon">
+          <i class="fas fa-pallet"></i>
+        </div>
+        <div class="brand-info">
+          <h1>PRODEX ERP</h1>
+          <span>Fábrica de Pallets</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <div class="nav-label">Visão Geral</div>
+        <a class="nav-item active" data-tab="dashboard">
+          <i class="fas fa-chart-pie"></i>
+          <span>Dashboard</span>
+          <span class="nav-badge" id="nav-critical-badge" style="display: none;">0</span>
+        </a>
+
+        <div class="nav-label">Módulos de Gestão</div>
+        <a class="nav-item" data-tab="products">
+          <i class="fas fa-boxes-stacked"></i>
+          <span>Estoque & Produtos</span>
+        </a>
+        <a class="nav-item" data-tab="employees">
+          <i class="fas fa-users-gear"></i>
+          <span>Equipe de Produção</span>
+        </a>
+        <a class="nav-item" data-tab="production">
+          <i class="fas fa-industry"></i>
+          <span>Apontamentos Diários</span>
+        </a>
+        <a class="nav-item" data-tab="movements">
+          <i class="fas fa-arrow-right-arrow-left"></i>
+          <span>Movimentações</span>
+        </a>
+
+        <div class="nav-label">Administração</div>
+        <a class="nav-item" data-tab="reports">
+          <i class="fas fa-file-invoice"></i>
+          <span>Relatórios & Backup</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="system-status">
+          <span class="status-dot"></span>
+          <span>Sistema Operacional (Online)</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-wrapper">
+      
+      <!-- Topbar Header -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="btn-icon-only menu-toggle-btn" id="btn-menu-toggle" title="Menu">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="page-heading">
+            <h2 id="page-title">Dashboard & Indicadores</h2>
+            <p id="page-subtitle">Visão geral do estoque, produção e desempenho operacional</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Quick Action Buttons -->
+          <div class="action-buttons-group">
+            <button class="btn btn-secondary btn-sm" onclick="openNewProductionModal()">
+              <i class="fas fa-plus"></i> Novo Apontamento
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="openNewProductModal()">
+              <i class="fas fa-box"></i> Novo Produto
+            </button>
+          </div>
+
+          <!-- Theme Toggle -->
+          <button class="btn-icon-only" id="btn-theme-toggle" title="Alternar Tema Claro/Escuro">
+            <i class="fas fa-sun" id="theme-icon"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <div class="page-content">
+
+        <!-- ==================== TAB 1: DASHBOARD ==================== -->
+        <section class="tab-pane active" id="tab-dashboard">
+          
+          <!-- KPI Cards Grid -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-title">Valor Total em Estoque</span>
+                <div class="stat-icon icon-primary">
+                  <i class="fas fa-sack-dollar"></i>
+                </div>
+              </div>
+              <div class="stat-value" id="kpi-stock-value">R$ 0,00</div>
+              <div class="stat-footer">
+                <span id="kpi-stock-units">0 itens em estoque</span>
+              </div>
+            </div>
+
+            <div class="stat-card card-warning">
+              <div class="stat-header">
+                <span class="stat-title">Alertas de Reposição</span>
+                <div class="stat-icon icon-warning">
+                  <i class="fas fa-triangle-exclamation"></i>
+                </div>
+              </div>
+              <div class="stat-value" id="kpi-critical-count" style="color: var(--color-warning);">0</div>
+              <div class="stat-footer">
+                <span>Produtos abaixo do estoque mínimo</span>
+              </div>
+            </div>
+
+            <div class="stat-card card-success">
+              <div class="stat-header">
+                <span class="stat-title">Produção Hoje</span>
+                <div class="stat-icon icon-success">
+                  <i class="fas fa-gears"></i>
+                </div>
+              </div>
+              <div class="stat-value" id="kpi-today-produced" style="color: var(--color-success);">0 un</div>
+              <div class="stat-footer">
+                <span class="trend-badge trend-up" id="kpi-target-pct">0% da meta</span>
+              </div>
+            </div>
+
+            <div class="stat-card card-purple">
+              <div class="stat-header">
+                <span class="stat-title">Índice de Qualidade</span>
+                <div class="stat-icon icon-purple">
+                  <i class="fas fa-circle-check"></i>
+                </div>
+              </div>
+              <div class="stat-value" id="kpi-quality-rate" style="color: var(--color-purple);">100%</div>
+              <div class="stat-footer">
+                <span>Aprovação sem refugo no período</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row 1 -->
+          <div class="charts-grid">
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="chart-title-area">
+                  <h3>Evolução da Produção Diária</h3>
+                  <p>Volume total de unidades produzidas nos últimos 7 dias</p>
+                </div>
+                <span class="badge badge-primary">7 Dias</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart-production-trend"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="chart-title-area">
+                  <h3>Estoque por Categoria</h3>
+                  <p>Distribuição do volume físico armazenado</p>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart-stock-categories"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row 2 -->
+          <div class="charts-grid">
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="chart-title-area">
+                  <h3>Produtividade por Colaborador Hoje vs Meta</h3>
+                  <p>Acompanhamento em tempo real da meta diária de unidades</p>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart-employee-prod"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="chart-title-area">
+                  <h3>Fluxo de Estoque</h3>
+                  <p>Total de unidades que deram Entrada vs Saída</p>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart-movements-balance"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Tables: Critical Stock & Leaderboard -->
+          <div class="charts-grid-2col">
+            
+            <!-- Urgent Stock Table -->
+            <div class="table-card">
+              <div class="chart-header" style="padding: 18px 22px; margin-bottom: 0;">
+                <div class="chart-title-area">
+                  <h3 style="color: var(--color-warning); display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-bell"></i> Itens com Estoque Baixo ou Crítico
+                  </h3>
+                  <p>Produtos que necessitam de reposição imediata</p>
+                </div>
+                <button class="btn btn-sm btn-outline" onclick="switchTab('products')">Ver Estoque</button>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Produto</th>
+                      <th>Saldo</th>
+                      <th>Mínimo</th>
+                      <th>Status</th>
+                      <th>Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashboard-critical-table">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Top Producers Leaderboard -->
+            <div class="table-card" style="padding: 22px;">
+              <div class="chart-header" style="margin-bottom: 14px;">
+                <div class="chart-title-area">
+                  <h3 style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-trophy" style="color: #fbbf24;"></i> Ranking de Produção Diária
+                  </h3>
+                  <p>Colaboradores mais produtivos no dia de hoje</p>
+                </div>
+                <button class="btn btn-sm btn-outline" onclick="switchTab('employees')">Ver Equipe</button>
+              </div>
+              <div id="dashboard-top-producers">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ==================== TAB 2: ESTOQUE & PRODUTOS ==================== -->
+        <section class="tab-pane" id="tab-products">
+          
+          <!-- Toolbar with search and filters -->
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-products" placeholder="Buscar por código, nome, categoria, local...">
+              </div>
+
+              <select class="select-filter" id="filter-product-category">
+                <option value="">Todas as Categorias</option>
+                <option value="Matéria-Prima">Matéria-Prima</option>
+                <option value="Insumo">Insumo</option>
+                <option value="Peça">Peça</option>
+                <option value="Produto Acabado">Produto Acabado</option>
+                <option value="Embalagem">Embalagem</option>
+              </select>
+
+              <select class="select-filter" id="filter-product-status">
+                <option value="">Todos os Status</option>
+                <option value="critical">Estoque Baixo / Crítico</option>
+                <option value="empty">Esgotado (Saldo Zero)</option>
+                <option value="normal">Estoque Normal</option>
+              </select>
+            </div>
+
+            <div class="toolbar-right">
+              <span class="badge badge-secondary" id="products-count-badge">0 itens</span>
+              <button class="btn btn-primary" onclick="openNewProductModal()">
+                <i class="fas fa-plus"></i> Novo Produto
+              </button>
+            </div>
+          </div>
+
+          <!-- Products Table -->
+          <div class="table-card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Produto / Localização</th>
+                    <th>Categoria</th>
+                    <th>Saldo Atual</th>
+                    <th>Est. Mínimo</th>
+                    <th>Preço Custo</th>
+                    <th>Preço Venda</th>
+                    <th>Total Custo</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="products-table-body">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==================== TAB 3: EQUIPE DE PRODUÇÃO ==================== -->
+        <section class="tab-pane" id="tab-employees">
+          
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-employees" placeholder="Buscar colaborador, matrícula, cargo...">
+              </div>
+
+              <select class="select-filter" id="filter-employee-shift">
+                <option value="">Todos os Turnos</option>
+                <option value="Manhã">Manhã</option>
+                <option value="Tarde">Tarde</option>
+                <option value="Noite">Noite</option>
+                <option value="Comercial">Comercial</option>
+              </select>
+
+              <select class="select-filter" id="filter-employee-status">
+                <option value="">Todos os Status</option>
+                <option value="Ativo">Ativo</option>
+                <option value="Em Férias">Em Férias</option>
+                <option value="Licença">Licença</option>
+              </select>
+            </div>
+
+            <div class="toolbar-right">
+              <span class="badge badge-secondary" id="employees-count-badge">0 colaboradores</span>
+              <button class="btn btn-primary" onclick="openNewEmployeeModal()">
+                <i class="fas fa-user-plus"></i> Novo Colaborador
+              </button>
+            </div>
+          </div>
+
+          <!-- Employees Cards Grid -->
+          <div class="employee-grid" id="employees-grid-container">
+            <!-- Populated dynamically -->
+          </div>
+
+        </section>
+
+        <!-- ==================== TAB 4: APONTAMENTOS DE PRODUÇÃO ==================== -->
+        <section class="tab-pane" id="tab-production">
+          
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <input type="date" class="select-filter" id="filter-production-date" title="Filtrar por data">
+              <select class="select-filter" id="filter-production-employee">
+                <option value="">Todos os Funcionários</option>
+              </select>
+              <select class="select-filter" id="filter-production-product">
+                <option value="">Todos os Produtos</option>
+              </select>
+            </div>
+
+            <div class="toolbar-right">
+              <span class="badge badge-secondary" id="production-records-count">0 apontamentos</span>
+              <button class="btn btn-primary" onclick="openNewProductionModal()">
+                <i class="fas fa-plus"></i> Novo Apontamento
+              </button>
+            </div>
+          </div>
+
+          <!-- Production Log Table -->
+          <div class="table-card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Colaborador</th>
+                    <th>Produto Fabricado</th>
+                    <th>Qtd Produzida</th>
+                    <th>Refugos / Qualidade</th>
+                    <th>Jornada</th>
+                    <th>Eficiência</th>
+                    <th style="text-align: right;">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="production-table-body">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==================== TAB 5: MOVIMENTAÇÕES DE ESTOQUE ==================== -->
+        <section class="tab-pane" id="tab-movements">
+          
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-movements" placeholder="Buscar por responsável, motivo, produto...">
+              </div>
+
+              <select class="select-filter" id="filter-movement-type">
+                <option value="">Todos os Tipos</option>
+                <option value="ENTRADA">Entradas</option>
+                <option value="SAIDA">Saídas</option>
+                <option value="AJUSTE">Ajustes de Inventário</option>
+              </select>
+            </div>
+
+            <div class="toolbar-right">
+              <span class="badge badge-secondary" id="movements-count-badge">0 registros</span>
+              <button class="btn btn-primary" onclick="openNewMovementModal()">
+                <i class="fas fa-exchange-alt"></i> Lançar Movimentação
+              </button>
+            </div>
+          </div>
+
+          <!-- Movements Table -->
+          <div class="table-card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Data & Hora</th>
+                    <th>Tipo</th>
+                    <th>Produto</th>
+                    <th>Quantidade</th>
+                    <th>Valor Total</th>
+                    <th>Responsável</th>
+                    <th>Motivo / Observação</th>
+                  </tr>
+                </thead>
+                <tbody id="movements-table-body">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==================== TAB 6: RELATÓRIOS & BACKUP ==================== -->
+        <section class="tab-pane" id="tab-reports">
+          
+          <div class="charts-grid-2col">
+            
+            <!-- Export CSV Card -->
+            <div class="stat-card">
+              <div class="stat-header">
+                <div>
+                  <h3 style="font-size: 1.1rem; font-weight: 700;">Exportação de Planilhas (CSV)</h3>
+                  <p style="font-size: 0.8rem; color: var(--text-secondary);">Gere arquivos compatíveis com Excel, Google Planilhas e ERPs</p>
+                </div>
+                <div class="stat-icon icon-primary">
+                  <i class="fas fa-file-csv"></i>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px;">
+                <button class="btn btn-secondary" onclick="exportProductsCSV()">
+                  <i class="fas fa-download"></i> Exportar Catálogo de Produtos & Estoque
+                </button>
+                <button class="btn btn-secondary" onclick="exportProductionCSV()">
+                  <i class="fas fa-download"></i> Exportar Apontamentos de Produção Diária
+                </button>
+                <button class="btn btn-secondary" onclick="exportMovementsCSV()">
+                  <i class="fas fa-download"></i> Exportar Histórico de Movimentações
+                </button>
+              </div>
+            </div>
+
+            <!-- Print & PDF Card -->
+            <div class="stat-card card-purple">
+              <div class="stat-header">
+                <div>
+                  <h3 style="font-size: 1.1rem; font-weight: 700;">Impressão & Relatório Oficial</h3>
+                  <p style="font-size: 0.8rem; color: var(--text-secondary);">Gere versão limpa formatada para impressão física ou PDF</p>
+                </div>
+                <div class="stat-icon icon-purple">
+                  <i class="fas fa-print"></i>
+                </div>
+              </div>
+              <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 10px;">
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">
+                  A visualização de impressão aplica layout econômico de alto contraste, otimizado para auditorias industriais e reuniões de turno.
+                </p>
+                <button class="btn btn-primary" onclick="printReport()">
+                  <i class="fas fa-print"></i> Imprimir Tela Atual / Salvar como PDF
+                </button>
+              </div>
+            </div>
+
+            <!-- Backup Card -->
+            <div class="stat-card card-success">
+              <div class="stat-header">
+                <div>
+                  <h3 style="font-size: 1.1rem; font-weight: 700;">Backup Integral do Sistema</h3>
+                  <p style="font-size: 0.8rem; color: var(--text-secondary);">Faça download de todos os seus dados em um único arquivo seguro</p>
+                </div>
+                <div class="stat-icon icon-success">
+                  <i class="fas fa-shield-halved"></i>
+                </div>
+              </div>
+              <div style="margin-top: 14px;">
+                <button class="btn btn-success" style="width: 100%;" onclick="exportFullBackupJSON()">
+                  <i class="fas fa-cloud-arrow-down"></i> Baixar Arquivo de Backup (.json)
+                </button>
+              </div>
+            </div>
+
+            <!-- Restore & Reset Card -->
+            <div class="stat-card card-danger">
+              <div class="stat-header">
+                <div>
+                  <h3 style="font-size: 1.1rem; font-weight: 700;">Restauração & Dados Padrão</h3>
+                  <p style="font-size: 0.8rem; color: var(--text-secondary);">Restaurar arquivo de backup ou redefinir para dados demonstrativos</p>
+                </div>
+                <div class="stat-icon icon-danger">
+                  <i class="fas fa-rotate-left"></i>
+                </div>
+              </div>
+              <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 10px;">
+                <label class="btn btn-secondary" style="cursor: pointer; text-align: center;">
+                  <i class="fas fa-file-import"></i> Restaurar a partir de arquivo JSON
+                  <input type="file" accept=".json" style="display: none;" onchange="handleBackupRestore(event)">
+                </label>
+                <button class="btn btn-outline" style="color: var(--color-danger); border-color: rgba(244, 63, 94, 0.3);" onclick="handleResetDatabase()">
+                  <i class="fas fa-trash-can"></i> Restaurar Dados Demonstrativos de Fábrica
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- Modal 1: Cadastro / Edição de Produto -->
+  <div class="modal-backdrop" id="modal-product">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 id="modal-product-title">Cadastrar Novo Produto</h3>
+        <button class="btn-close-modal" onclick="closeModal('modal-product')">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="form-product">
+        <div class="modal-body">
+          <div class="form-grid">
+            
+            <div class="form-group">
+              <label for="prod-code">Código / SKU *</label>
+              <input type="text" id="prod-code" required placeholder="Ex: MP-1001">
+            </div>
+
+            <div class="form-group">
+              <label for="prod-category">Categoria / Tipo *</label>
+              <select id="prod-category" required>
+                <option value="Matéria-Prima">Matéria-Prima</option>
+                <option value="Insumo">Insumo</option>
+                <option value="Peça">Peça</option>
+                <option value="Produto Acabado">Produto Acabado</option>
+                <option value="Embalagem">Embalagem</option>
+              </select>
+            </div>
+
+            <div class="form-group col-span-2">
+              <label for="prod-name">Nome do Produto / Descrição Curta *</label>
+              <input type="text" id="prod-name" required placeholder="Ex: Chapa de Aço Inox 304 (2x1m)">
+            </div>
+
+            <div class="form-group">
+              <label for="prod-unit">Unidade de Medida *</label>
+              <select id="prod-unit" required>
+                <option value="un">Unidade (un)</option>
+                <option value="kg">Quilograma (kg)</option>
+                <option value="g">Grama (g)</option>
+                <option value="m">Metro (m)</option>
+                <option value="m²">Metro Quadrado (m²)</option>
+                <option value="L">Litro (L)</option>
+                <option value="cx">Caixa (cx)</option>
+                <option value="fardo">Fardo (fardo)</option>
+                <option value="galão">Galão (galão)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="prod-location">Localização no Estoque / Galpão</label>
+              <input type="text" id="prod-location" placeholder="Ex: Galpão A - Prateleira 02">
+            </div>
+
+            <div class="form-group">
+              <label for="prod-cost">Preço de Custo (R$) *</label>
+              <div class="input-prefix-group">
+                <span class="input-prefix">R$</span>
+                <input type="number" id="prod-cost" step="0.01" min="0" required placeholder="0.00">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="prod-sale">Preço de Venda / Valor Estimado (R$) *</label>
+              <div class="input-prefix-group">
+                <span class="input-prefix">R$</span>
+                <input type="number" id="prod-sale" step="0.01" min="0" required placeholder="0.00">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="prod-stock">Quantidade em Estoque Atual *</label>
+              <input type="number" id="prod-stock" step="any" min="0" required placeholder="0">
+            </div>
+
+            <div class="form-group">
+              <label for="prod-min-stock">Estoque Mínimo (Ponto de Alerta) *</label>
+              <input type="number" id="prod-min-stock" step="any" min="0" required placeholder="10">
+            </div>
+
+            <div class="form-group col-span-2">
+              <label for="prod-max-stock">Estoque Máximo Desejado</label>
+              <input type="number" id="prod-max-stock" step="any" min="0" placeholder="100">
+            </div>
+
+            <div class="form-group col-span-2">
+              <label for="prod-notes">Observações / Detalhes do Fornecedor</label>
+              <textarea id="prod-notes" rows="2" placeholder="Especificações técnicas, lote ou detalhes adicionais"></textarea>
+            </div>
+
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-product')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Produto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Cadastro / Edição de Colaborador -->
+  <div class="modal-backdrop" id="modal-employee">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 id="modal-employee-title">Cadastrar Colaborador da Produção</h3>
+        <button class="btn-close-modal" onclick="closeModal('modal-employee')">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="form-employee">
+        <div class="modal-body">
+          <div class="form-grid">
+            
+            <div class="form-group">
+              <label for="emp-badge">Matrícula / ID *</label>
+              <input type="text" id="emp-badge" required placeholder="Ex: OP-101">
+            </div>
+
+            <div class="form-group">
+              <label for="emp-status">Status Operacional *</label>
+              <select id="emp-status" required>
+                <option value="Ativo">Ativo</option>
+                <option value="Em Férias">Em Férias</option>
+                <option value="Licença">Licença</option>
+              </select>
+            </div>
+
+            <div class="form-group col-span-2">
+              <label for="emp-name">Nome Completo *</label>
+              <input type="text" id="emp-name" required placeholder="Ex: Carlos Alberto Ferreira">
+            </div>
+
+            <div class="form-group">
+              <label for="emp-role">Cargo / Função *</label>
+              <input type="text" id="emp-role" required placeholder="Ex: Operador de CNC, Montador, Soldador">
+            </div>
+
+            <div class="form-group">
+              <label for="emp-dept">Setor / Departamento</label>
+              <input type="text" id="emp-dept" placeholder="Ex: Usinagem, Linha de Montagem, Pintura">
+            </div>
+
+            <div class="form-group">
+              <label for="emp-shift">Turno de Trabalho *</label>
+              <select id="emp-shift" required>
+                <option value="Manhã">Manhã (06:00 às 14:20)</option>
+                <option value="Tarde">Tarde (14:20 às 22:40)</option>
+                <option value="Noite">Noite (22:40 às 06:00)</option>
+                <option value="Comercial">Comercial (08:00 às 17:48)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="emp-target">Meta Diária Individual (un/dia) *</label>
+              <input type="number" id="emp-target" min="1" required placeholder="Ex: 30">
+            </div>
+
+            <div class="form-group">
+              <label for="emp-phone">Telefone / Contato</label>
+              <input type="text" id="emp-phone" placeholder="(00) 00000-0000">
+            </div>
+
+            <div class="form-group">
+              <label for="emp-admission">Data de Admissão</label>
+              <input type="date" id="emp-admission">
+            </div>
+
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-employee')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Colaborador</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 3: Apontamento de Produção Diária -->
+  <div class="modal-backdrop" id="modal-production-entry">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 id="modal-production-title">Novo Apontamento de Produção</h3>
+        <button class="btn-close-modal" onclick="closeModal('modal-production-entry')">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="form-production-entry">
+        <div class="modal-body">
+          <div class="form-grid">
+            
+            <div class="form-group">
+              <label for="entry-date">Data da Produção *</label>
+              <input type="date" id="entry-date" required>
+            </div>
+
+            <div class="form-group">
+              <label for="entry-hours">Horas Trabalhadas</label>
+              <input type="number" id="entry-hours" step="0.5" min="1" max="24" value="8" required>
+            </div>
+
+            <div class="form-group col-span-2">
+              <label for="entry-employee-select">Colaborador Responsável *</label>
+              <select id="entry-employee-select" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <div class="form-group col-span-2">
+              <label for="entry-product-select">Produto Fabricado / Montado *</label>
+              <select id="entry-product-select" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="entry-qty">Quantidade Produzida (Aprovada) *</label>
+              <input type="number" id="entry-qty" min="1" required placeholder="Ex: 35">
+            </div>
+
+            <div class="form-group">
+              <label for="entry-defects">Peças com Defeito (Refugo / Perda)</label>
+              <input type="number" id="entry-defects" min="0" value="0" placeholder="0">
+            </div>
+
+            <div class="form-group col-span-2" style="background: var(--bg-surface-elevated); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" id="entry-update-stock" checked style="width: 18px; height: 18px; accent-color: var(--color-primary);">
+                <span><strong>Atualizar estoque automaticamente</strong>: Dar entrada imediata das peças aprovadas no estoque do produto</span>
+              </label>
+            </div>
+
+            <div class="form-group col-span-2">
+              <label for="entry-notes">Observações do Turno / Justificativas</label>
+              <textarea id="entry-notes" rows="2" placeholder="Ocorrências, pausas para manutenção preventiva ou observações de qualidade"></textarea>
+            </div>
+
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-production-entry')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Registrar Apontamento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 4: Ajuste Rápido de Estoque (Entrada/Saída/Ajuste) -->
+  <div class="modal-backdrop" id="modal-adjust-stock">
+    <div class="modal-window" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3>Movimentar Estoque</h3>
+        <button class="btn-close-modal" onclick="closeModal('modal-adjust-stock')">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="form-stock-adjust">
+        <div class="modal-body">
+          <div style="background: var(--bg-surface-elevated); padding: 14px; border-radius: var(--radius-md); margin-bottom: 18px; border: 1px solid var(--border-subtle);">
+            <div style="font-size: 0.8rem; color: var(--text-secondary);">Produto Selecionado:</div>
+            <div style="font-size: 1rem; font-weight: 700;" id="adjust-prod-name">-</div>
+            <div style="font-size: 0.85rem; color: var(--color-primary); margin-top: 4px;">
+              Saldo Atual: <strong id="adjust-prod-current-stock">-</strong>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="form-group">
+              <label for="adjust-type">Tipo de Operação *</label>
+              <select id="adjust-type" required>
+                <option value="ENTRADA">Entrada de Estoque (+)</option>
+                <option value="SAIDA">Saída de Estoque (-)</option>
+                <option value="AJUSTE">Ajuste de Inventário (Nova Contagem Física)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="adjust-qty">Quantidade *</label>
+              <input type="number" id="adjust-qty" step="any" min="0.01" required placeholder="Informe a quantidade">
+            </div>
+
+            <div class="form-group">
+              <label for="adjust-responsible">Responsável pelo Lançamento</label>
+              <input type="text" id="adjust-responsible" placeholder="Ex: Almoxarife / Supervisor">
+            </div>
+
+            <div class="form-group">
+              <label for="adjust-reason">Motivo / Documento / Justificativa *</label>
+              <input type="text" id="adjust-reason" required placeholder="Ex: NF-e 8829, Envio para linha, Perda de matéria-prima">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-adjust-stock')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Confirmar Movimentação</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 5: Nova Movimentação Manual Avulsa -->
+  <div class="modal-backdrop" id="modal-manual-movement">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3>Lançar Movimentação de Estoque</h3>
+        <button class="btn-close-modal" onclick="closeModal('modal-manual-movement')">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="form-manual-movement">
+        <div class="modal-body">
+          <div class="form-grid">
+            
+            <div class="form-group col-span-2">
+              <label for="mov-product-select">Produto *</label>
+              <select id="mov-product-select" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="mov-type-select">Tipo de Movimentação *</label>
+              <select id="mov-type-select" required>
+                <option value="ENTRADA">Entrada (Compra, Devolução, Produção)</option>
+                <option value="SAIDA">Saída (Venda, Descarte, Uso)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="mov-qty">Quantidade *</label>
+              <input type="number" id="mov-qty" step="any" min="0.01" required placeholder="0">
+            </div>
+
+            <div class="form-group">
+              <label for="mov-responsible">Responsável</label>
+              <input type="text" id="mov-responsible" placeholder="Nome do operador">
+            </div>
+
+            <div class="form-group">
+              <label for="mov-reason">Motivo / Documento *</label>
+              <input type="text" id="mov-reason" required placeholder="Ex: NF-e de entrada ou Pedido de saída">
+            </div>
+
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-manual-movement')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Registrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/store.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/production.js"></script>
+  <script src="js/movements.js"></script>
+  <script src="js/reports.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
