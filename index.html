@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PRODEX - Sistema de Controle de Estoque e Gestão de Produção</title>
+  <title>PRODEX Cloud ERP - Sistema Integrado de Estoque e Gestão de Produção</title>
   
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -19,15 +19,26 @@
 
   <div class="app-container">
     
-    <!-- Sidebar Navigation -->
+    <!-- Sidebar Navigation (Enterprise Navy) -->
     <aside class="sidebar">
       <div class="brand-section">
         <div class="brand-icon">
-          <i class="fas fa-pallet"></i>
+          <i class="fas fa-cubes"></i>
         </div>
         <div class="brand-info">
-          <h1>PRODEX ERP</h1>
-          <span>Fábrica de Pallets</span>
+          <h1>PRODEX <span class="brand-badge">CLOUD ERP</span></h1>
+          <span>Gestão Industrial Integrada</span>
+        </div>
+      </div>
+
+      <!-- Empresa Ativa -->
+      <div class="company-badge-box">
+        <div class="company-avatar">
+          <i class="fas fa-building"></i>
+        </div>
+        <div class="company-info">
+          <strong>Pallets Brasil Ind. e Comércio</strong>
+          <span>Matriz • CNPJ 14.892.401/0001-88</span>
         </div>
       </div>
 
@@ -35,18 +46,18 @@
         <div class="nav-label">Visão Geral</div>
         <a class="nav-item active" data-tab="dashboard">
           <i class="fas fa-chart-pie"></i>
-          <span>Dashboard</span>
+          <span>Dashboard Analítico</span>
           <span class="nav-badge" id="nav-critical-badge" style="display: none;">0</span>
         </a>
 
-        <div class="nav-label">Módulos de Gestão</div>
+        <div class="nav-label">Gestão de Chão de Fábrica</div>
         <a class="nav-item" data-tab="products">
           <i class="fas fa-boxes-stacked"></i>
           <span>Estoque & Produtos</span>
         </a>
         <a class="nav-item" data-tab="employees">
           <i class="fas fa-id-card"></i>
-          <span>Colaboradores</span>
+          <span>Colaboradores & RH</span>
         </a>
         <a class="nav-item" data-tab="production">
           <i class="fas fa-industry"></i>
@@ -54,10 +65,10 @@
         </a>
         <a class="nav-item" data-tab="movements">
           <i class="fas fa-arrow-right-arrow-left"></i>
-          <span>Movimentações</span>
+          <span>Movimentações & Auditoria</span>
         </a>
 
-        <div class="nav-label">Administração</div>
+        <div class="nav-label">Controladoria & Fiscal</div>
         <a class="nav-item" data-tab="reports">
           <i class="fas fa-file-invoice"></i>
           <span>Relatórios & Backup</span>
@@ -67,7 +78,7 @@
       <div class="sidebar-footer">
         <div class="system-status">
           <span class="status-dot"></span>
-          <span>Sistema Operacional (Online)</span>
+          <span>Ambiente em Nuvem (Online) • v2.4</span>
         </div>
       </div>
     </aside>
@@ -75,35 +86,68 @@
     <!-- Main Content Area -->
     <main class="main-wrapper">
       
-      <!-- Topbar Header -->
+      <!-- Topbar Header (Enterprise Clean) -->
       <header class="topbar">
         <div class="topbar-left">
           <button class="btn-icon-only menu-toggle-btn" id="btn-menu-toggle" title="Menu">
             <i class="fas fa-bars"></i>
           </button>
           <div class="page-heading">
+            <div class="breadcrumb-box">
+              <i class="fas fa-home" style="font-size: 0.75rem;"></i>
+              <span>PRODEX Cloud</span>
+              <span>/</span>
+              <span id="breadcrumb-module">Módulos</span>
+              <span>/</span>
+              <strong id="breadcrumb-current" style="color: var(--color-primary);">Dashboard</strong>
+            </div>
             <h2 id="page-title">Dashboard & Indicadores</h2>
-            <p id="page-subtitle">Visão geral do estoque, produção e desempenho operacional</p>
           </div>
         </div>
 
         <div class="topbar-right">
           <!-- Quick Action Buttons -->
           <div class="action-buttons-group">
-            <button class="btn btn-secondary btn-sm" onclick="openNewProductionModal()">
-              <i class="fas fa-plus"></i> Novo Apontamento
+            <button class="btn btn-secondary btn-sm" onclick="openNewProductionModal()" title="Lançar produção do turno">
+              <i class="fas fa-plus"></i> Apontar Produção
             </button>
-            <button class="btn btn-primary btn-sm" onclick="openNewProductModal()">
+            <button class="btn btn-primary btn-sm" onclick="openNewProductModal()" title="Cadastrar novo item no inventário">
               <i class="fas fa-box"></i> Novo Produto
             </button>
           </div>
 
-          <!-- Theme Toggle -->
-          <button class="btn-icon-only" id="btn-theme-toggle" title="Alternar Tema Claro/Escuro">
-            <i class="fas fa-sun" id="theme-icon"></i>
+          <!-- Notification Bell -->
+          <button class="btn-icon-only" id="btn-notifications" onclick="switchTab('products')" title="Notificações e Alertas">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge-dot" id="top-notification-dot" style="display: none;"></span>
           </button>
+
+          <!-- Theme Toggle -->
+          <button class="btn-icon-only" id="btn-theme-toggle" title="Alternar Modo Escuro / Claro">
+            <i class="fas fa-moon" id="theme-icon"></i>
+          </button>
+
+          <!-- User Profile -->
+          <div class="topbar-user" title="Perfil do Usuário Autenticado">
+            <div class="user-avatar-sm">LS</div>
+            <div class="user-details">
+              <strong>Lucas Silva</strong>
+              <span>Gerente de Operações</span>
+            </div>
+          </div>
         </div>
       </header>
+
+      <!-- Low Stock Global Warning Ribbon -->
+      <div class="alert-ribbon" id="top-alert-ribbon" style="display: none;">
+        <div class="alert-ribbon-content">
+          <i class="fas fa-triangle-exclamation"></i>
+          <span id="top-alert-message">Atenção: existem itens abaixo do estoque mínimo de segurança.</span>
+        </div>
+        <button class="btn btn-sm btn-outline" style="padding: 2px 10px; font-size: 0.725rem;" onclick="switchTab('products')">
+          Ver Itens Críticos
+        </button>
+      </div>
 
       <!-- Page Content -->
       <div class="page-content">

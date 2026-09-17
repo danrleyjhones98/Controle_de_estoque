@@ -56,6 +56,9 @@ function updateDashboardKPIs() {
   const elTodayTargetPct = document.getElementById('kpi-target-pct');
   const elQualityRate = document.getElementById('kpi-quality-rate');
   const elCriticalBadge = document.getElementById('nav-critical-badge');
+  const elTopRibbon = document.getElementById('top-alert-ribbon');
+  const elTopAlertMsg = document.getElementById('top-alert-message');
+  const elTopNotifDot = document.getElementById('top-notification-dot');
 
   if (elTotalStockVal) elTotalStockVal.textContent = formatCurrency(totalCost);
   if (elTotalStockUnits) elTotalStockUnits.textContent = `${totalUnits.toLocaleString('pt-BR')} itens em estoque`;
@@ -70,12 +73,28 @@ function updateDashboardKPIs() {
     elCriticalBadge.textContent = criticalProducts.length;
     elCriticalBadge.style.display = criticalProducts.length > 0 ? 'inline-block' : 'none';
   }
+
+  // Manage Enterprise Top Alert Ribbon & Notification Bell Dot
+  if (elTopNotifDot) {
+    elTopNotifDot.style.display = criticalProducts.length > 0 ? 'block' : 'none';
+  }
+  if (elTopRibbon) {
+    if (criticalProducts.length > 0) {
+      elTopRibbon.style.display = 'flex';
+      if (elTopAlertMsg) {
+        const itemNames = criticalProducts.slice(0, 2).map(p => p.name).join(', ');
+        elTopAlertMsg.innerHTML = `<strong>Atenção Operacional:</strong> ${criticalProducts.length} item(ns) estão com estoque no limite ou abaixo da margem de segurança (${itemNames}${criticalProducts.length > 2 ? '...' : ''}).`;
+      }
+    } else {
+      elTopRibbon.style.display = 'none';
+    }
+  }
 }
 
 function renderDashboardCharts() {
   const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-  const textColor = isDark ? '#94a3b8' : '#64748b';
-  const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+  const textColor = isDark ? '#94a3b8' : '#475569';
+  const gridColor = isDark ? 'rgba(255, 255, 255, 0.06)' : '#e2e8f0';
 
   const production = window.store.getProductionRecords();
   const employees = window.store.getEmployees();

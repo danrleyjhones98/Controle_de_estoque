@@ -22,21 +22,50 @@ function switchTab(tabId) {
     }
   });
 
-  // Page titles
-  const titles = {
-    'dashboard': { title: 'Dashboard & Indicadores', sub: 'Visão geral do estoque de madeiras, pregos, pallets acabados e produtividade fabril' },
-    'products': { title: 'Controle de Estoque & Produtos', sub: 'Madeiras, tábuas, tocos, pregos espiralados, pallets acabados e peças' },
-    'employees': { title: 'Equipe de Produção', sub: 'Montadores pneumáticos, operadores de serra múltipla, estufa HT e expedição' },
-    'production': { title: 'Apontamentos Diários de Pallets', sub: 'Lançamento de pallets montados, desdobro de madeira, refugo e metas' },
-    'movements': { title: 'Movimentações de Estoque', sub: 'Entradas de cargas de madeira, expedição de carretas de pallets e inventário' },
-    'reports': { title: 'Relatórios & Configurações', sub: 'Exportação de planilhas de pallets, auditoria física e backup do sistema' }
+  // Page titles and breadcrumb hierarchy
+  const moduleConfig = {
+    'dashboard': { 
+      module: 'Visão Geral & BI', 
+      title: 'Dashboard & Indicadores', 
+      sub: 'Visão geral do estoque de madeiras, pregos, pallets acabados e produtividade fabril' 
+    },
+    'products': { 
+      module: 'Gestão de Materiais', 
+      title: 'Controle de Estoque & Produtos', 
+      sub: 'Madeiras, barrotes, réguas, tocos, pregos espiralados e pallets acabados' 
+    },
+    'employees': { 
+      module: 'Recursos Humanos', 
+      title: 'Equipe de Produção & Colaboradores', 
+      sub: 'Montadores pneumáticos, operadores de serra múltipla, operadores de estufa HT e expedição' 
+    },
+    'production': { 
+      module: 'Chão de Fábrica', 
+      title: 'Apontamentos Diários de Pallets', 
+      sub: 'Lançamento de pallets montados, desdobro de madeira, refugo e metas diárias' 
+    },
+    'movements': { 
+      module: 'Logística & Almoxarifado', 
+      title: 'Movimentações de Estoque', 
+      sub: 'Entradas de cargas de madeira, expedição de carretas de pallets e inventário' 
+    },
+    'reports': { 
+      module: 'Controladoria & Auditoria', 
+      title: 'Relatórios & Exportação', 
+      sub: 'Exportação de relatórios, auditoria física e backup seguro do sistema' 
+    }
   };
 
-  const current = titles[tabId] || titles['dashboard'];
+  const current = moduleConfig[tabId] || moduleConfig['dashboard'];
   const titleEl = document.getElementById('page-title');
   const subEl = document.getElementById('page-subtitle');
+  const bcModuleEl = document.getElementById('breadcrumb-module');
+  const bcCurrentEl = document.getElementById('breadcrumb-current');
+
   if (titleEl) titleEl.textContent = current.title;
   if (subEl) subEl.textContent = current.sub;
+  if (bcModuleEl) bcModuleEl.textContent = current.module;
+  if (bcCurrentEl) bcCurrentEl.textContent = current.title;
 
   // Refresh tab-specific views
   if (tabId === 'dashboard') {
@@ -107,9 +136,9 @@ function showToast(message, type = 'info', duration = 3500) {
   }, duration);
 }
 
-// Theme Toggle
+// Theme Toggle (Default to clean corporate light theme)
 function setupTheme() {
-  const savedTheme = localStorage.getItem('app_theme') || 'dark';
+  const savedTheme = localStorage.getItem('app_theme') || 'light';
   document.documentElement.setAttribute('data-theme', savedTheme);
   updateThemeIcon(savedTheme);
 
