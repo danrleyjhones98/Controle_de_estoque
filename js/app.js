@@ -44,7 +44,7 @@ function switchTab(tabId) {
   } else if (tabId === 'products') {
     renderProductsTable();
   } else if (tabId === 'employees') {
-    renderEmployeesGrid();
+    renderEmployees();
   } else if (tabId === 'production') {
     renderProductionTable();
     populateProductionSelects();

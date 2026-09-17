@@ -2,7 +2,7 @@
  * store.js - Central Data Management & Persistence (Especializado: Fábrica de Pallets)
  */
 
-const STORAGE_VERSION = 'pallet_factory_v2_3';
+const STORAGE_VERSION = 'pallet_factory_v2_4';
 const VERSION_KEY = 'sto_data_version';
 
 const STORAGE_KEYS = {
@@ -490,73 +490,103 @@ const SEED_EMPLOYEES = [
     id: 'emp-pal-001',
     badge: 'OP-201',
     name: 'Valter José da Silva',
+    cpf: '234.567.890-12',
     role: 'Montador de Pallets Pneumático',
     department: 'Linha de Montagem PBR',
     shift: 'Manhã',
     dailyTarget: 80, // 80 pallets PBR/dia
+    salary: 2850.00,
     status: 'Ativo',
     phone: '(11) 98722-1101',
-    admissionDate: '2023-01-10'
+    email: 'valter.silva@pallets.com.br',
+    pix: '23456789012',
+    admissionDate: '2023-01-10',
+    notes: 'Especialista na montagem rápida de pallets PBR em bancada pneumática. Alta assiduidade.'
   },
   {
     id: 'emp-pal-002',
     badge: 'OP-202',
     name: 'Marcos Vinicius Ribeiro',
+    cpf: '345.678.901-23',
     role: 'Operador de Pregadeira Automática',
     department: 'Linha Automatizada',
     shift: 'Manhã',
     dailyTarget: 160, // 160 pallets/dia
+    salary: 3200.00,
     status: 'Ativo',
     phone: '(11) 97633-2202',
-    admissionDate: '2023-05-18'
+    email: 'marcos.ribeiro@pallets.com.br',
+    pix: 'marcos.pregadeira@gmail.com',
+    admissionDate: '2023-05-18',
+    notes: 'Operador técnico da máquina pregadeira automática e responsável pela lubrificação diária.'
   },
   {
     id: 'emp-pal-003',
     badge: 'OP-203',
     name: 'Antônio Carlos de Souza',
+    cpf: '456.789.012-34',
     role: 'Operador de Destopadeira e Serra',
     department: 'Corte e Desdobro de Madeira',
     shift: 'Manhã',
     dailyTarget: 450, // 450 tábuas cortadas e destopadas/dia
+    salary: 2950.00,
     status: 'Ativo',
     phone: '(11) 96544-3303',
-    admissionDate: '2022-09-01'
+    email: 'antonio.souza@pallets.com.br',
+    pix: '11965443303',
+    admissionDate: '2022-09-01',
+    notes: 'Responsável pela destopadeira de réguas e afiação das serras circulares.'
   },
   {
     id: 'emp-pal-004',
     badge: 'OP-204',
     name: 'Lucas Ferreira Lima',
+    cpf: '567.890.123-45',
     role: 'Montador Especialista (Pallet Euro)',
     department: 'Linha de Exportação',
     shift: 'Tarde',
     dailyTarget: 65, // 65 pallets Euro/dia
+    salary: 2900.00,
     status: 'Ativo',
     phone: '(11) 95455-4404',
-    admissionDate: '2023-11-20'
+    email: 'lucas.lima@pallets.com.br',
+    pix: 'lucas.lima@pallets.com.br',
+    admissionDate: '2023-11-20',
+    notes: 'Linha especial Euro EPAL com medidas rigorosas e caixas industriais sob medida.'
   },
   {
     id: 'emp-pal-005',
     badge: 'OP-205',
     name: 'Tiago Santos Barbosa',
+    cpf: '678.901.234-56',
     role: 'Operador de Estufa e Tratamento HT',
     department: 'Tratamento Térmico Fitossanitário',
     shift: 'Tarde',
     dailyTarget: 120, // 120 pallets inspecionados e carimbados/dia
+    salary: 3100.00,
     status: 'Ativo',
     phone: '(11) 94366-5505',
-    admissionDate: '2024-02-15'
+    email: 'tiago.barbosa@pallets.com.br',
+    pix: 'tiago.ht@outlook.com',
+    admissionDate: '2024-02-15',
+    notes: 'Certificado em tratamento fitossanitário HT / Ministério da Agricultura para exportação.'
   },
   {
     id: 'emp-pal-006',
     badge: 'OP-206',
     name: 'Edimilson Alencar Ramos',
+    cpf: '789.012.345-67',
     role: 'Conferente de Qualidade e Amarrilho',
     department: 'Expedição e Pátio',
     shift: 'Comercial',
     dailyTarget: 300, // 300 pallets arqueados em fardos/dia
+    salary: 2600.00,
     status: 'Ativo',
     phone: '(11) 93277-6606',
-    admissionDate: '2024-06-01'
+    email: 'edimilson.ramos@pallets.com.br',
+    pix: '11932776606',
+    admissionDate: '2024-06-01',
+    notes: 'Conferência final de pregos sobressalentes, arqueação em fardos e carregamento de caminhões.'
   }
 ];
 
@@ -864,15 +894,20 @@ class Store {
     const employees = this.getEmployees();
     const newEmp = {
       id: 'emp-' + Date.now(),
-      badge: empData.badge || `OP-${Math.floor(100 + Math.random() * 900)}`,
+      badge: empData.badge ? empData.badge.trim() : `OP-${Math.floor(100 + Math.random() * 900)}`,
       name: empData.name.trim(),
+      cpf: empData.cpf ? empData.cpf.trim() : '',
       role: empData.role ? empData.role.trim() : 'Montador de Pallets',
       department: empData.department ? empData.department.trim() : 'Produção',
       shift: empData.shift || 'Manhã',
       dailyTarget: parseInt(empData.dailyTarget, 10) || 50,
+      salary: parseFloat(empData.salary) || 0,
       status: empData.status || 'Ativo',
-      phone: empData.phone || '',
-      admissionDate: empData.admissionDate || new Date().toISOString().split('T')[0]
+      phone: empData.phone ? empData.phone.trim() : '',
+      email: empData.email ? empData.email.trim() : '',
+      pix: empData.pix ? empData.pix.trim() : '',
+      admissionDate: empData.admissionDate || new Date().toISOString().split('T')[0],
+      notes: empData.notes ? empData.notes.trim() : ''
     };
 
     employees.unshift(newEmp);
@@ -888,7 +923,8 @@ class Store {
     employees[index] = {
       ...employees[index],
       ...updates,
-      dailyTarget: parseInt(updates.dailyTarget ?? employees[index].dailyTarget, 10) || 50
+      dailyTarget: parseInt(updates.dailyTarget ?? employees[index].dailyTarget, 10) || 50,
+      salary: parseFloat(updates.salary ?? employees[index].salary) || 0
     };
 
     this.save(STORAGE_KEYS.EMPLOYEES, employees);

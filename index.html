@@ -45,8 +45,8 @@
           <span>Estoque & Produtos</span>
         </a>
         <a class="nav-item" data-tab="employees">
-          <i class="fas fa-users-gear"></i>
-          <span>Equipe de Produção</span>
+          <i class="fas fa-id-card"></i>
+          <span>Colaboradores</span>
         </a>
         <a class="nav-item" data-tab="production">
           <i class="fas fa-industry"></i>
@@ -336,14 +336,70 @@
 
         </section>
 
-        <!-- ==================== TAB 3: EQUIPE DE PRODUÇÃO ==================== -->
+        <!-- ==================== TAB 3: GESTÃO DE COLABORADORES ==================== -->
         <section class="tab-pane" id="tab-employees">
           
+          <!-- Employee Quick Stats Grid -->
+          <div class="stats-grid" style="margin-bottom: 22px;">
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-title">Total de Colaboradores</span>
+                <div class="stat-icon icon-primary">
+                  <i class="fas fa-users"></i>
+                </div>
+              </div>
+              <div class="stat-value" id="emp-stat-total">0</div>
+              <div class="stat-footer">
+                <span id="emp-stat-active">0 ativos no momento</span>
+              </div>
+            </div>
+
+            <div class="stat-card card-success">
+              <div class="stat-header">
+                <span class="stat-title">Meta Diária Global</span>
+                <div class="stat-icon icon-success">
+                  <i class="fas fa-bullseye"></i>
+                </div>
+              </div>
+              <div class="stat-value" id="emp-stat-target" style="color: var(--color-success);">0 un</div>
+              <div class="stat-footer">
+                <span>Capacidade projetada por dia</span>
+              </div>
+            </div>
+
+            <div class="stat-card card-warning">
+              <div class="stat-header">
+                <span class="stat-title">Média Individual</span>
+                <div class="stat-icon icon-warning">
+                  <i class="fas fa-chart-simple"></i>
+                </div>
+              </div>
+              <div class="stat-value" id="emp-stat-avg-target" style="color: var(--color-warning);">0 un</div>
+              <div class="stat-footer">
+                <span>Meta média por colaborador/turno</span>
+              </div>
+            </div>
+
+            <div class="stat-card card-purple">
+              <div class="stat-header">
+                <span class="stat-title">Folha de Produção</span>
+                <div class="stat-icon icon-purple">
+                  <i class="fas fa-wallet"></i>
+                </div>
+              </div>
+              <div class="stat-value" id="emp-stat-payroll" style="color: var(--color-purple);">R$ 0,00</div>
+              <div class="stat-footer">
+                <span>Remuneração total cadastrada</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Toolbar with search and filters -->
           <div class="toolbar">
             <div class="toolbar-left">
-              <div class="search-box">
+              <div class="search-box" style="min-width: 300px;">
                 <i class="fas fa-search"></i>
-                <input type="text" id="search-employees" placeholder="Buscar colaborador, matrícula, cargo...">
+                <input type="text" id="search-employees" placeholder="Buscar por nome, CPF, matrícula, função ou setor...">
               </div>
 
               <select class="select-filter" id="filter-employee-shift">
@@ -359,7 +415,18 @@
                 <option value="Ativo">Ativo</option>
                 <option value="Em Férias">Em Férias</option>
                 <option value="Licença">Licença</option>
+                <option value="Desligado">Desligado</option>
               </select>
+
+              <!-- View Mode Switcher -->
+              <div style="display: flex; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 2px;">
+                <button type="button" class="btn btn-sm btn-primary" id="btn-view-emp-table" onclick="setEmployeeViewMode('table')" title="Visualizar em Tabela Detalhada">
+                  <i class="fas fa-table-list"></i> Tabela
+                </button>
+                <button type="button" class="btn btn-sm btn-outline" id="btn-view-emp-cards" onclick="setEmployeeViewMode('cards')" title="Visualizar em Cards de Desempenho">
+                  <i class="fas fa-grip"></i> Cards
+                </button>
+              </div>
             </div>
 
             <div class="toolbar-right">
@@ -370,8 +437,33 @@
             </div>
           </div>
 
-          <!-- Employees Cards Grid -->
-          <div class="employee-grid" id="employees-grid-container">
+          <!-- Employees Detailed Table View -->
+          <div class="table-card" id="employees-table-container">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Matrícula</th>
+                    <th>Colaborador</th>
+                    <th>CPF</th>
+                    <th>Função / Cargo</th>
+                    <th>Setor / Linha</th>
+                    <th>Turno</th>
+                    <th>Meta Diária</th>
+                    <th>Contato / PIX</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Ações de Edição</th>
+                  </tr>
+                </thead>
+                <tbody id="employees-table-body">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Employees Cards Grid View (Alternative View) -->
+          <div class="employee-grid" id="employees-grid-container" style="display: none;">
             <!-- Populated dynamically -->
           </div>
 
@@ -493,6 +585,9 @@
               <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px;">
                 <button class="btn btn-secondary" onclick="exportProductsCSV()">
                   <i class="fas fa-download"></i> Exportar Catálogo de Produtos & Estoque
+                </button>
+                <button class="btn btn-secondary" onclick="exportEmployeesCSV()">
+                  <i class="fas fa-download"></i> Exportar Cadastro Completo de Colaboradores
                 </button>
                 <button class="btn btn-secondary" onclick="exportProductionCSV()">
                   <i class="fas fa-download"></i> Exportar Apontamentos de Produção Diária
@@ -675,11 +770,11 @@
     </div>
   </div>
 
-  <!-- Modal 2: Cadastro / Edição de Colaborador -->
+  <!-- Modal 2: Cadastro / Edição Completa de Colaborador -->
   <div class="modal-backdrop" id="modal-employee">
-    <div class="modal-window">
+    <div class="modal-window" style="max-width: 720px;">
       <div class="modal-header">
-        <h3 id="modal-employee-title">Cadastrar Colaborador da Produção</h3>
+        <h3 id="modal-employee-title">Cadastrar Colaborador</h3>
         <button class="btn-close-modal" onclick="closeModal('modal-employee')">
           <i class="fas fa-times"></i>
         </button>
@@ -690,7 +785,7 @@
             
             <div class="form-group">
               <label for="emp-badge">Matrícula / ID *</label>
-              <input type="text" id="emp-badge" required placeholder="Ex: OP-101">
+              <input type="text" id="emp-badge" required placeholder="Ex: OP-201">
             </div>
 
             <div class="form-group">
@@ -699,22 +794,28 @@
                 <option value="Ativo">Ativo</option>
                 <option value="Em Férias">Em Férias</option>
                 <option value="Licença">Licença</option>
+                <option value="Desligado">Desligado</option>
               </select>
             </div>
 
             <div class="form-group col-span-2">
-              <label for="emp-name">Nome Completo *</label>
-              <input type="text" id="emp-name" required placeholder="Ex: Carlos Alberto Ferreira">
+              <label for="emp-name">Nome Completo do Colaborador *</label>
+              <input type="text" id="emp-name" required placeholder="Ex: Valter José da Silva">
+            </div>
+
+            <div class="form-group">
+              <label for="emp-cpf">CPF (Cadastro de Pessoa Física) *</label>
+              <input type="text" id="emp-cpf" required placeholder="000.000.000-00" maxlength="14">
             </div>
 
             <div class="form-group">
               <label for="emp-role">Cargo / Função *</label>
-              <input type="text" id="emp-role" required placeholder="Ex: Operador de CNC, Montador, Soldador">
+              <input type="text" id="emp-role" required placeholder="Ex: Montador de Pallets Pneumático">
             </div>
 
             <div class="form-group">
-              <label for="emp-dept">Setor / Departamento</label>
-              <input type="text" id="emp-dept" placeholder="Ex: Usinagem, Linha de Montagem, Pintura">
+              <label for="emp-dept">Setor / Linha de Produção *</label>
+              <input type="text" id="emp-dept" placeholder="Ex: Linha de Montagem PBR, Corte, Pátio HT">
             </div>
 
             <div class="form-group">
@@ -729,12 +830,30 @@
 
             <div class="form-group">
               <label for="emp-target">Meta Diária Individual (un/dia) *</label>
-              <input type="number" id="emp-target" min="1" required placeholder="Ex: 30">
+              <input type="number" id="emp-target" min="1" required placeholder="Ex: 80">
             </div>
 
             <div class="form-group">
-              <label for="emp-phone">Telefone / Contato</label>
-              <input type="text" id="emp-phone" placeholder="(00) 00000-0000">
+              <label for="emp-salary">Salário Base / Remuneração (R$)</label>
+              <div class="input-prefix-group">
+                <span class="input-prefix">R$</span>
+                <input type="number" id="emp-salary" step="0.01" min="0" placeholder="0.00">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="emp-phone">Telefone / WhatsApp</label>
+              <input type="text" id="emp-phone" placeholder="(11) 90000-0000" maxlength="15">
+            </div>
+
+            <div class="form-group">
+              <label for="emp-email">E-mail</label>
+              <input type="email" id="emp-email" placeholder="colaborador@empresa.com.br">
+            </div>
+
+            <div class="form-group">
+              <label for="emp-pix">Chave PIX para Pagamento</label>
+              <input type="text" id="emp-pix" placeholder="CPF, E-mail, Celular ou Aleatória">
             </div>
 
             <div class="form-group">
@@ -742,11 +861,18 @@
               <input type="date" id="emp-admission">
             </div>
 
+            <div class="form-group col-span-2">
+              <label for="emp-notes">Observações / Anotações Internas</label>
+              <textarea id="emp-notes" rows="2" placeholder="Habilidades técnicas, cursos de segurança, histórico ou anotações gerais"></textarea>
+            </div>
+
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" onclick="closeModal('modal-employee')">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Salvar Colaborador</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Salvar Colaborador
+          </button>
         </div>
       </form>
     </div>

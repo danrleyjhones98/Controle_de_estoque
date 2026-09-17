@@ -46,6 +46,20 @@ function exportProductionCSV() {
   window.showToast('Relatório de Produção exportado com sucesso!', 'success');
 }
 
+// Export Employees to CSV
+function exportEmployeesCSV() {
+  const employees = window.store.getEmployees();
+  const headers = ['Matricula;Nome;CPF;Cargo;Departamento;Turno;MetaDiaria;Salario;Telefone;Email;PIX;Status;DataAdmissao;Observacoes'];
+  const rows = employees.map(e => 
+    `"${e.badge || ''}";"${e.name || ''}";"${e.cpf || ''}";"${e.role || ''}";"${e.department || ''}";"${e.shift || ''}";"${e.dailyTarget || 0}";"${e.salary || 0}";"${e.phone || ''}";"${e.email || ''}";"${e.pix || ''}";"${e.status || ''}";"${e.admissionDate || ''}";"${(e.notes || '').replace(/"/g, '""')}"`
+  );
+
+  const csvContent = '\uFEFF' + [headers, ...rows].join('\r\n');
+  const dateStr = new Date().toISOString().split('T')[0];
+  downloadFile(csvContent, `relatorio_colaboradores_${dateStr}.csv`, 'text/csv;charset=utf-8;');
+  window.showToast('Relatório de Colaboradores exportado!', 'success');
+}
+
 // Export Movements to CSV
 function exportMovementsCSV() {
   const movements = window.store.getMovements();
@@ -110,6 +124,7 @@ function printReport() {
 // Expose globals
 window.exportProductsCSV = exportProductsCSV;
 window.exportProductionCSV = exportProductionCSV;
+window.exportEmployeesCSV = exportEmployeesCSV;
 window.exportMovementsCSV = exportMovementsCSV;
 window.exportFullBackupJSON = exportFullBackupJSON;
 window.handleBackupRestore = handleBackupRestore;
